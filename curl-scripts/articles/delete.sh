@@ -1,8 +1,8 @@
 #!/bin/bash
 
-curl "http://localhost:8000/mangos/" \
+curl "http://localhost:8000/articles/${ID}/" \
   --include \
-  --request GET \
+  --request DELETE \
   --header "Authorization: Token ${TOKEN}"
 
 echo

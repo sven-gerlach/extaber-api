@@ -1,13 +1,13 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-
-from .models.mango import Mango
+from .models.article import Article
 from .models.user import User
 
-class MangoSerializer(serializers.ModelSerializer):
+class ArticleSerializer(serializers.ModelSerializer):
+    """Serializer for the Article class"""
     class Meta:
-        model = Mango
-        fields = ('id', 'name', 'color', 'ripe', 'owner')
+        model = Article
+        fields = ('id', 'headline', 'body', 'owner')
 
 class UserSerializer(serializers.ModelSerializer):
     # This model serializer will be used for User creation
@@ -18,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
         # https://docs.djangoproject.com/en/3.0/topics/auth/customizing/#referencing-the-user-model
         model = get_user_model()
         fields = ('id', 'email', 'password')
-        extra_kwargs = { 'password': { 'write_only': True, 'min_length': 5 } }
+        extra_kwargs = { 'password': { 'write_only': True, 'min_length': 3 } }
 
     # This create method will be used for model creation
     def create(self, validated_data):
