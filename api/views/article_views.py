@@ -1,3 +1,5 @@
+"""Module for article views"""
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
@@ -8,14 +10,13 @@ from django.contrib.auth import get_user, authenticate, login, logout
 from django.middleware.csrf import get_token
 
 from ..models.article import Article
-from ..serializers import ArticleSerializer, UserSerializer
+from ..serializers import ArticleSerializer
 
 
 # Create your views here.
 class Articles(generics.ListCreateAPIView):
     """A class for getting an index of all articles and for creating a new article"""
     permission_classes = [IsAuthenticatedOrReadOnly]
-    serializer_class = ArticleSerializer
 
     def get(self, request):
         """Index request"""
@@ -42,7 +43,6 @@ class Articles(generics.ListCreateAPIView):
 
 class ArticleDetail(generics.RetrieveUpdateDestroyAPIView):
     """class for detailed pk specific http requests"""
-    permission_classes = [IsAuthenticated, ]
 
     def get(self, request, pk):
         """Show request"""
@@ -65,17 +65,17 @@ class ArticleDetail(generics.RetrieveUpdateDestroyAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def partial_update(self, request, pk):
-        """Update Request"""
+        """Update request"""
         # Remove owner from request object if get dict method returns True
         if request.data['article'].get('owner', False):
-            del request.data['mango']['owner']
+            del request.data['article']['owner']
 
         # Locate article
         # get_object_or_404 returns a object representation
         article = get_object_or_404(Article, pk=pk)
         # Check if user is the same as the request.user.id
         if not request.user.id == article.owner.id:
-            raise PermissionDenied('Unauthorized, you not the author of this article!')
+            raise PermissionDenied('Unauthorized, you are not the author of this article!')
 
         # Add owner to data object now that we know this user owns the resource
         request.data['article']['owner'] = request.user.id

@@ -1,13 +1,22 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models.article import Article
-from .models.user import User
+from .models.comment import Comment
 
 class ArticleSerializer(serializers.ModelSerializer):
     """Serializer for the Article class"""
+    comments = serializers.StringRelatedField(many=True, read_only=True)
     class Meta:
         model = Article
-        fields = ('id', 'headline', 'body', 'owner')
+        fields = ('id', 'headline', 'body', 'owner', 'comments')
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    """A serializer class for comments"""
+    class Meta:
+        model = Comment
+        fields = ('id', 'body', 'article', 'owner')
+
 
 class UserSerializer(serializers.ModelSerializer):
     # This model serializer will be used for User creation
@@ -18,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
         # https://docs.djangoproject.com/en/3.0/topics/auth/customizing/#referencing-the-user-model
         model = get_user_model()
         fields = ('id', 'email', 'password')
-        extra_kwargs = { 'password': { 'write_only': True, 'min_length': 3 } }
+        extra_kwargs = {'password': {'write_only': True, 'min_length': 3}}
 
     # This create method will be used for model creation
     def create(self, validated_data):

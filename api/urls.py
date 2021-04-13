@@ -1,6 +1,7 @@
 from django.urls import path
-from .views.article_views import Articles, ArticleDetail
 from .views.user_views import SignUp, SignIn, SignOut, ChangePassword
+from .views.article_views import Articles, ArticleDetail
+from .views.comment_views import Comments, CommentDetail
 
 urlpatterns = [
     path('sign-up/', SignUp.as_view(), name='sign-up'),
@@ -9,4 +10,6 @@ urlpatterns = [
     path('change-pw/', ChangePassword.as_view(), name='change-pw'),
     path('articles/', Articles.as_view(), name='articles'),
     path('articles/<int:pk>/', ArticleDetail.as_view(), name='article_detail'),
+    path('comments/', Comments.as_view(), name='comments'),
+    path('comments/<int:pk>/', CommentDetail.as_view(), name='comment_detail'),
 ]

@@ -1,29 +1,33 @@
 
-"""A module for PostgreSQL article models"""
+"""A module for the PostgreSQL comment model"""
 
 from django.db import models
 from django.contrib.auth import get_user_model
+from .article import Article
 
 
-# todo: consider using set() to persist articles beyond deletion of the user
 # Create your models here.
-class Article(models.Model):
-    """A model for articles written by a user"""
-    headline = models.CharField(max_length=200)
+class Comment(models.Model):
+    """A model for comments made by a user on a specific article"""
     body = models.TextField()
     owner = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE
     )
+    article = models.ForeignKey(
+        Article,
+        related_name='comments',
+        on_delete=models.CASCADE
+    )
 
     def __str__(self):
-        return f"Article with headline: {self.headline}"
+        return self.body
 
     def as_dict(self):
         """Returns dictionary version of Article model"""
         return {
             'pk': self.pk,
-            'headline': self.headline,
             'body': self.body,
-            'owner': self.owner
+            'owner': self.owner,
+            'article': self.article
         }

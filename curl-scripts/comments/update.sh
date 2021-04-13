@@ -1,16 +1,14 @@
 #!/bin/bash
 
-curl "http://localhost:8000/articles/" \
+curl "http://localhost:8000/comments/${ID}/" \
   --include \
-  --request POST \
+  --request PATCH \
   --header "Content-Type: application/json" \
   --header "Authorization: Token ${TOKEN}" \
   --data '{
-    "article": {
-      "headline": "'"${HL}"'",
+    "comment": {
       "body": "'"${BODY}"'"
     }
   }'
 
-echo
 echo
