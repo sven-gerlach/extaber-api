@@ -2,6 +2,7 @@ from django.urls import path
 from .views.user_views import SignUp, SignIn, SignOut, ChangePassword
 from .views.article_views import Articles, ArticleDetail
 from .views.comment_views import Comments, CommentDetail
+from .views.article_votes_views import ArticleVotes
 
 urlpatterns = [
     path('sign-up/', SignUp.as_view(), name='sign-up'),
@@ -12,4 +13,5 @@ urlpatterns = [
     path('articles/<int:pk>/', ArticleDetail.as_view(), name='article_detail'),
     path('comments/', Comments.as_view(), name='comments'),
     path('comments/<int:pk>/', CommentDetail.as_view(), name='comment_detail'),
+    path('article-votes/', ArticleVotes.as_view(), name='article_votes'),
 ]

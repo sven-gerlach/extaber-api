@@ -1,14 +1,10 @@
 """Module for article views"""
 
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import generics, status
 from django.shortcuts import get_object_or_404
-from django.contrib.auth import get_user, authenticate, login, logout
-from django.middleware.csrf import get_token
-
 from ..models.article import Article
 from ..serializers import ArticleSerializer
 
@@ -32,7 +28,7 @@ class Articles(generics.ListCreateAPIView):
         request.data['article']['owner'] = request.user.id
         # Serialize/create article
         serialized_article = ArticleSerializer(data=request.data['article'])
-        # If the mango data is valid according to our serializer...
+        # If the data is valid according to our serializer...
         if serialized_article.is_valid():
             # Save the created article & send a response
             serialized_article.save()

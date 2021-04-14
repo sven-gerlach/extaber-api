@@ -3,7 +3,7 @@
 
 from django.db import models
 from django.contrib.auth import get_user_model
-from .article_votes import ArticleVotes
+from .article_votes import ArticleVote
 
 
 # todo: consider using set() to persist articles beyond deletion of the user
@@ -18,7 +18,7 @@ class Article(models.Model):
     )
     votes = models.ManyToManyField(
         get_user_model(),
-        through=ArticleVotes,
+        through=ArticleVote,
         through_fields=['article', 'owner'],
         related_name='+',
         blank=True,
