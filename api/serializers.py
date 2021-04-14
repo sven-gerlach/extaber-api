@@ -5,22 +5,6 @@ from .models.comment import Comment
 from .models.article_votes import ArticleVote
 from .models.comment_votes import CommentVote
 
-class ArticleSerializer(serializers.ModelSerializer):
-    """Serializer for the Article class"""
-    comments = serializers.StringRelatedField(many=True, read_only=True)
-
-    class Meta:
-        model = Article
-        fields = ('id', 'headline', 'body', 'owner', 'comments')
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    """A serializer class for comments"""
-    class Meta:
-        model = Comment
-        fields = ('id', 'body', 'article', 'owner')
-
-
 class ArticleVotesSerializer(serializers.ModelSerializer):
     """A serializer class for votes on articles"""
     class Meta:
@@ -33,6 +17,43 @@ class CommentVotesSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommentVote
         fields = ('id', 'owner', 'comment', 'vote')
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    """A serializer class for comments"""
+    net_votes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'body', 'article', 'owner', 'net_votes')
+
+    def get_net_votes(self, comment):
+        comment_votes = comment.commentvote_set.all()
+
+        net_votes = 0
+        for key in comment_votes:
+            net_votes += key.vote
+
+        return net_votes
+
+
+class ArticleSerializer(serializers.ModelSerializer):
+    """Serializer for the Article class"""
+    comments = serializers.StringRelatedField(many=True, read_only=True)
+    article_votes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Article
+        fields = ('id', 'headline', 'body', 'owner', 'comments', 'article_votes')
+
+    def get_article_votes(self, article):
+        article_votes = article.articlevote_set.all()
+
+        net_votes = 0
+        for key in article_votes:
+            net_votes += key.vote
+
+        return {"net_votes": net_votes}
 
 
 class UserSerializer(serializers.ModelSerializer):

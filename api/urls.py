@@ -18,7 +18,7 @@ urlpatterns = [
 
     # comment paths
     path('comments/', Comments.as_view(), name='comments'),
-    path('commensts/<int:pk>/', CommentDetail.as_view(), name='comment_detail'),
+    path('comments/<int:pk>/', CommentDetail.as_view(), name='comment_detail'),
 
     # paths for article votes
     path('article-votes/', ArticleVotes.as_view(), name='article_votes'),

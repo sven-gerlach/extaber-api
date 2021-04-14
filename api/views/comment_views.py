@@ -35,6 +35,12 @@ class Comments(generics.ListCreateAPIView):
 class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     """class for all requests that amend an existing comment with a particular pk"""
 
+    def get(self, request, pk):
+        """Retrieve all comments associated with article pk"""
+        comments = Comment.objects.all().filter(article=pk)
+        serialized_comment = CommentSerializer(comments, many=True)
+        return Response({'comments': serialized_comment.data})
+
     def partial_update(self, request, pk):
         """Update request owned by the user"""
         # Remove owner from request object if get dict method returns True
