@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models.article import Article
 from .models.comment import Comment
+from .models.article_votes import ArticleVotes
 
 class ArticleSerializer(serializers.ModelSerializer):
     """Serializer for the Article class"""
@@ -16,6 +17,13 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'body', 'article', 'owner')
+
+
+class ArticleVotesSerializer(serializers.ModelSerializer):
+    """A serializer class for votes on articles"""
+    class Meta:
+        model = ArticleVotes
+        fields = ('id', 'owner', 'article', 'vote')
 
 
 class UserSerializer(serializers.ModelSerializer):

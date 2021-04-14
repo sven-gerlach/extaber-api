@@ -24,7 +24,7 @@ class Articles(generics.ListCreateAPIView):
         articles = Article.objects.all()
         # Run the data through the serializer
         serialized_article = ArticleSerializer(articles, many=True)
-        return Response({'articles': serialized_article.data})
+        return Response({'article': serialized_article.data})
 
     def post(self, request):
         """Create request"""
@@ -80,7 +80,7 @@ class ArticleDetail(generics.RetrieveUpdateDestroyAPIView):
         # Add owner to data object now that we know this user owns the resource
         request.data['article']['owner'] = request.user.id
         # Validate updates with serializer
-        serialized_article = ArticleSerializer(article, data=request.data['article'])
+        serialized_article = ArticleSerializer(article, data=request.data['article'], partial=True)
         if serialized_article.is_valid():
             # Save & send a 204 no content
             serialized_article.save()

@@ -3,6 +3,7 @@
 
 from django.db import models
 from django.contrib.auth import get_user_model
+from .article_votes import ArticleVotes
 
 
 # todo: consider using set() to persist articles beyond deletion of the user
@@ -14,6 +15,13 @@ class Article(models.Model):
     owner = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE
+    )
+    votes = models.ManyToManyField(
+        get_user_model(),
+        through=ArticleVotes,
+        through_fields=['article', 'owner'],
+        related_name='+',
+        blank=True,
     )
 
     def __str__(self):

@@ -8,8 +8,7 @@ curl "http://localhost:8000/articles/${ID}/" \
   --data '{
     "article": {
       "headline": "'"${HL}"'",
-      "body": "'"${BODY}"'",
-      "owner": "'"${OWNER}"'"
+      "body": "'"${BODY}"'"
     }
   }'
 
