@@ -37,6 +37,7 @@ class CommentSerializer(serializers.ModelSerializer):
         return net_votes
 
 
+# todo: may need this serializer later
 class ArticleSerializer(serializers.ModelSerializer):
     """Serializer for the Article class"""
     comments = serializers.StringRelatedField(many=True, read_only=True)
@@ -45,6 +46,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = ('id', 'headline', 'body', 'owner', 'comments', 'article_votes')
+        depth = 1
 
     def get_article_votes(self, article):
         article_votes = article.articlevote_set.all()
@@ -54,6 +56,35 @@ class ArticleSerializer(serializers.ModelSerializer):
             net_votes += key.vote
 
         return {"net_votes": net_votes}
+
+
+class ArticleSerializerUnauthenticated(serializers.ModelSerializer):
+    """A serializer class for unauthenticated users"""
+    author = serializers.SerializerMethodField()
+    net_votes = serializers.SerializerMethodField()
+    comment_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Article
+        fields = ('id', 'headline', 'created_at', 'author', 'net_votes', 'comment_count')
+
+    def get_author(self, article):
+        """serializer method returning the owner email"""
+        return article.owner.email
+
+    def get_net_votes(self, article):
+        """serializer method return the net votes"""
+        article_votes = article.articlevote_set.all()
+
+        net_votes = 0
+        for key in article_votes:
+            net_votes += key.vote
+
+        return net_votes
+
+    def get_comment_count(self, article):
+        """Serializer method returning the count of comments made on each article"""
+        return article.comments.count()
 
 
 class UserSerializer(serializers.ModelSerializer):

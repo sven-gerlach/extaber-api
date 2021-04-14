@@ -23,6 +23,8 @@ class Article(models.Model):
         related_name='+',
         blank=True,
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Article with headline: {self.headline}"

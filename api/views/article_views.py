@@ -6,7 +6,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework import generics, status
 from django.shortcuts import get_object_or_404
 from ..models.article import Article
-from ..serializers import ArticleSerializer
+from ..serializers import ArticleSerializer, ArticleSerializerUnauthenticated
 
 
 # Create your views here.
@@ -19,7 +19,7 @@ class Articles(generics.ListCreateAPIView):
         # Get all the articles:
         articles = Article.objects.all()
         # Run the data through the serializer
-        serialized_article = ArticleSerializer(articles, many=True)
+        serialized_article = ArticleSerializerUnauthenticated(articles, many=True)
         return Response({'article': serialized_article.data})
 
     def post(self, request):
