@@ -3,22 +3,22 @@
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import generics, status
-from ..serializers import ArticleVotesSerializer
-from ..models.article_votes import ArticleVote
+from ..serializers import CommentVotesSerializer
+from ..models.comment_votes import CommentVote
 
-class ArticleVotes(generics.ListCreateAPIView):
+class CommentVotes(generics.ListCreateAPIView):
     """
-    A class for retrieving, creating an instance of the
-    ArticleVote model class
+    A class for retrieving and creating an instance of the
+    CommentVote model class
     """
     permission_classes = (IsAuthenticatedOrReadOnly, )
 
     def get(self, request):
         """Index request"""
         # Get all the votes:
-        votes = ArticleVote.objects.all()
+        votes = CommentVote.objects.all()
         # Run the data through the serializer
-        serialized_votes = ArticleVotesSerializer(votes, many=True)
+        serialized_votes = CommentVotesSerializer(votes, many=True)
         return Response({'votes': serialized_votes.data})
 
     def post(self, request):
@@ -26,7 +26,7 @@ class ArticleVotes(generics.ListCreateAPIView):
         # Add user to request data object
         request.data['vote']['owner'] = request.user.id
         # Serialize/create article
-        serialized_vote = ArticleVotesSerializer(data=request.data['vote'])
+        serialized_vote = CommentVotesSerializer(data=request.data['vote'])
         # If the data is valid according to our serializer...
         if serialized_vote.is_valid():
             # Save the created article & send a response
@@ -36,18 +36,18 @@ class ArticleVotes(generics.ListCreateAPIView):
         return Response(serialized_vote.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ArticleVotesDetail(generics.RetrieveUpdateDestroyAPIView):
+class CommentVotesDetail(generics.RetrieveUpdateDestroyAPIView):
     """class for article specific http requests"""
 
     def get(self, request, pk):
-        """Return net votes for article pk"""
+        """Return net votes for comment pk"""
         # Locate the article to show
-        votes = ArticleVote.objects.all()
+        votes = CommentVote.objects.all()
 
-        # Filter votes for articles with pk
-        filtered_votes = votes.filter(article=pk)
+        # Filter votes for comments with pk
+        filtered_votes = votes.filter(comment=pk)
 
-        # if there no articles matching that pk, return no content
+        # if there no comments matching the pk, return no content
         if len(filtered_votes) == 0:
             return Response(status=status.HTTP_204_NO_CONTENT)
 

@@ -3,11 +3,12 @@ from rest_framework import serializers
 from .models.article import Article
 from .models.comment import Comment
 from .models.article_votes import ArticleVote
-
+from .models.comment_votes import CommentVote
 
 class ArticleSerializer(serializers.ModelSerializer):
     """Serializer for the Article class"""
     comments = serializers.StringRelatedField(many=True, read_only=True)
+
     class Meta:
         model = Article
         fields = ('id', 'headline', 'body', 'owner', 'comments')
@@ -25,6 +26,13 @@ class ArticleVotesSerializer(serializers.ModelSerializer):
     class Meta:
         model = ArticleVote
         fields = ('id', 'owner', 'article', 'vote')
+
+
+class CommentVotesSerializer(serializers.ModelSerializer):
+    """A serializer class for votes on comments"""
+    class Meta:
+        model = CommentVote
+        fields = ('id', 'owner', 'comment', 'vote')
 
 
 class UserSerializer(serializers.ModelSerializer):

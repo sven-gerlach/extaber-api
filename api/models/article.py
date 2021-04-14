@@ -19,7 +19,7 @@ class Article(models.Model):
     votes = models.ManyToManyField(
         get_user_model(),
         through=ArticleVote,
-        through_fields=['article', 'owner'],
+        through_fields=('article', 'owner'),
         related_name='+',
         blank=True,
     )
@@ -33,5 +33,6 @@ class Article(models.Model):
             'pk': self.pk,
             'headline': self.headline,
             'body': self.body,
-            'owner': self.owner
+            'owner': self.owner,
+            'votes': self.votes
         }

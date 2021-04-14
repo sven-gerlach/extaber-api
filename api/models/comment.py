@@ -4,6 +4,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from .article import Article
+from ..models.comment_votes import CommentVote
 
 
 # Create your models here.
@@ -18,6 +19,14 @@ class Comment(models.Model):
         Article,
         related_name='comments',
         on_delete=models.CASCADE
+    )
+
+    votes = models.ManyToManyField(
+        get_user_model(),
+        through=CommentVote,
+        through_fields=('comment', 'owner'),
+        related_name='+',
+        blank=True,
     )
 
     def __str__(self):
