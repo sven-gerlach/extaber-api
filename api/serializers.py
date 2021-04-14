@@ -1,13 +1,60 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from .models.article import Article
+from .models.comment import Comment
+from .models.article_votes import ArticleVote
+from .models.comment_votes import CommentVote
 
-from .models.mango import Mango
-from .models.user import User
-
-class MangoSerializer(serializers.ModelSerializer):
+class ArticleVotesSerializer(serializers.ModelSerializer):
+    """A serializer class for votes on articles"""
     class Meta:
-        model = Mango
-        fields = ('id', 'name', 'color', 'ripe', 'owner')
+        model = ArticleVote
+        fields = ('id', 'owner', 'article', 'vote')
+
+
+class CommentVotesSerializer(serializers.ModelSerializer):
+    """A serializer class for votes on comments"""
+    class Meta:
+        model = CommentVote
+        fields = ('id', 'owner', 'comment', 'vote')
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    """A serializer class for comments"""
+    net_votes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'body', 'article', 'owner', 'net_votes')
+
+    def get_net_votes(self, comment):
+        comment_votes = comment.commentvote_set.all()
+
+        net_votes = 0
+        for key in comment_votes:
+            net_votes += key.vote
+
+        return net_votes
+
+
+class ArticleSerializer(serializers.ModelSerializer):
+    """Serializer for the Article class"""
+    comments = serializers.StringRelatedField(many=True, read_only=True)
+    article_votes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Article
+        fields = ('id', 'headline', 'body', 'owner', 'comments', 'article_votes')
+
+    def get_article_votes(self, article):
+        article_votes = article.articlevote_set.all()
+
+        net_votes = 0
+        for key in article_votes:
+            net_votes += key.vote
+
+        return {"net_votes": net_votes}
+
 
 class UserSerializer(serializers.ModelSerializer):
     # This model serializer will be used for User creation
@@ -18,7 +65,7 @@ class UserSerializer(serializers.ModelSerializer):
         # https://docs.djangoproject.com/en/3.0/topics/auth/customizing/#referencing-the-user-model
         model = get_user_model()
         fields = ('id', 'email', 'password')
-        extra_kwargs = { 'password': { 'write_only': True, 'min_length': 5 } }
+        extra_kwargs = {'password': {'write_only': True, 'min_length': 3}}
 
     # This create method will be used for model creation
     def create(self, validated_data):

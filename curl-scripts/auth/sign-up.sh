@@ -5,7 +5,10 @@ curl "http://localhost:8000/sign-up/" \
   --data '{
     "credentials": {
       "email": "'"${EMAIL}"'",
-      "password": "'"${PASSWORD}"'",
-      "password_confirmation": "'"${PASSWORD}"'"
+      "password": "'"${PW}"'",
+      "password_confirmation": "'"${PW}"'"
     }
   }'
+
+echo
+echo
