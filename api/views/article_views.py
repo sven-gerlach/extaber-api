@@ -20,13 +20,14 @@ class Articles(generics.ListCreateAPIView):
         articles = Article.objects.all()
         # Run the data through the serializer
         serialized_article = ArticleSerializerUnauthenticated(articles, many=True)
-        return Response({'article': serialized_article.data})
+        return Response({'articles': serialized_article.data})
 
     def post(self, request):
         """Create request"""
         # Add user to request data object
         request.data['article']['owner'] = request.user.id
         # Serialize/create article
+
         serialized_article = ArticleSerializer(data=request.data['article'])
         # If the data is valid according to our serializer...
         if serialized_article.is_valid():
