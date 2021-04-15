@@ -6,7 +6,10 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework import generics, status
 from django.shortcuts import get_object_or_404
 from ..models.article import Article
-from ..serializers import ArticleSerializer, ArticleSerializerUnauthenticated
+from ..serializers import \
+    ArticleSerializer, \
+    ArticleSerializerUnauthenticated, \
+    MyArticleSerializer
 
 
 # Create your views here.
@@ -38,18 +41,9 @@ class Articles(generics.ListCreateAPIView):
         return Response(serialized_article.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class MyArticles(generics.ListAPIView):
-    """A class for user specific requests"""
-
-    def get(self, request):
-        """Index request to get all articles created by user"""
-        articles = Article.objects.all()
-        my_articles = articles.filter(owner=request.user.id)
-        my_articles_serialized = ArticleSerializer(my_articles, many=True)
-        return Response({'articles': my_articles_serialized.data}, status=status.HTTP_200_OK)
-
-class ArticleDetail(generics.RetrieveUpdateDestroyAPIView):
-    """class for detailed pk specific http requests"""
+class ShowArticle(generics.ListAPIView):
+    """Class specifically for showing one article"""
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, pk):
         """Show request to return one article with pk"""
@@ -59,6 +53,21 @@ class ArticleDetail(generics.RetrieveUpdateDestroyAPIView):
         # Run the data through the serializer so it's formatted
         serialized_article = ArticleSerializer(article)
         return Response({'article': serialized_article.data})
+
+
+class MyArticles(generics.ListAPIView):
+    """A class for user specific requests"""
+
+    def get(self, request):
+        """Index request to get all articles created by user"""
+        articles = Article.objects.all()
+        my_articles = articles.filter(owner=request.user.id)
+        my_articles_serialized = MyArticleSerializer(my_articles, many=True)
+        return Response({'my_articles': my_articles_serialized.data}, status=status.HTTP_200_OK)
+
+
+class ArticleDetail(generics.RetrieveUpdateDestroyAPIView):
+    """class for detailed pk specific http requests"""
 
     def delete(self, request, pk):
         """Delete request to delete one article with pk"""

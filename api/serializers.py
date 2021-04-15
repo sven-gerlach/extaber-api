@@ -40,7 +40,8 @@ class CommentSerializer(serializers.ModelSerializer):
 class ArticleSerializer(serializers.ModelSerializer):
     """Serializer for the Article class"""
     comments = serializers.StringRelatedField(many=True, read_only=True)
-    net_article_votes = serializers.SerializerMethodField()
+    net_votes = serializers.SerializerMethodField()
+    author = serializers.SerializerMethodField()
 
     class Meta:
         model = Article
@@ -51,20 +52,25 @@ class ArticleSerializer(serializers.ModelSerializer):
             'img_url',
             'body',
             'comments',
-            'net_article_votes',
+            'net_votes',
             'created_at',
             'updated_at',
-            'owner'
+            'owner',
+            'author'
         )
 
-    def get_net_article_votes(self, article):
+    def get_net_votes(self, article):
         article_votes = article.articlevote_set.all()
 
-        net_article_votes = 0
+        net_votes = 0
         for key in article_votes:
-            net_article_votes += key.vote
+            net_votes += key.vote
 
-        return net_article_votes
+        return net_votes
+
+    def get_author(self, article):
+        """serializer method returning the owner email"""
+        return article.owner.email
 
 
 class ArticleSerializerUnauthenticated(serializers.ModelSerializer):
@@ -103,6 +109,24 @@ class ArticleSerializerUnauthenticated(serializers.ModelSerializer):
     def get_comment_count(self, article):
         """Serializer method returning the count of comments made on each article"""
         return article.comments.count()
+
+
+class MyArticleSerializer(ArticleSerializerUnauthenticated):
+    class Meta:
+        model = Article
+        fields = (
+            'id',
+            'title',
+            'sub_title',
+            'img_url',
+            'body',
+            'comments',
+            'author',
+            'created_at',
+            'updated_at',
+            'net_votes',
+            'comment_count'
+        )
 
 
 class UserSerializer(serializers.ModelSerializer):
