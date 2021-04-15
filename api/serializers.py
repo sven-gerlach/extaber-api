@@ -40,7 +40,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class ArticleSerializer(serializers.ModelSerializer):
     """Serializer for the Article class"""
     comments = serializers.StringRelatedField(many=True, read_only=True)
-    article_votes = serializers.SerializerMethodField()
+    net_article_votes = serializers.SerializerMethodField()
 
     class Meta:
         model = Article
@@ -51,21 +51,20 @@ class ArticleSerializer(serializers.ModelSerializer):
             'img_url',
             'body',
             'comments',
-            'article_votes',
+            'net_article_votes',
             'created_at',
             'updated_at',
             'owner'
         )
-        # depth = 1
 
-    def get_article_votes(self, article):
+    def get_net_article_votes(self, article):
         article_votes = article.articlevote_set.all()
 
-        net_votes = 0
+        net_article_votes = 0
         for key in article_votes:
-            net_votes += key.vote
+            net_article_votes += key.vote
 
-        return {"net_votes": net_votes}
+        return net_article_votes
 
 
 class ArticleSerializerUnauthenticated(serializers.ModelSerializer):
