@@ -2,9 +2,12 @@
 
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.exceptions import PermissionDenied
 from rest_framework import generics, status
 from ..serializers import ArticleVotesSerializer
+from ..models.article import Article
 from ..models.article_votes import ArticleVote
+from django.shortcuts import get_object_or_404
 
 class ArticleVotes(generics.ListCreateAPIView):
     """
@@ -23,17 +26,47 @@ class ArticleVotes(generics.ListCreateAPIView):
 
     def post(self, request):
         """Create a vote"""
-        # Add user to request data object
-        request.data['vote']['owner'] = request.user.id
-        # Serialize/create article
-        serialized_vote = ArticleVotesSerializer(data=request.data['vote'])
-        # If the data is valid according to our serializer...
-        if serialized_vote.is_valid():
-            # Save the created article & send a response
-            serialized_vote.save()
-            return Response({'vote': serialized_vote.data}, status=status.HTTP_201_CREATED)
-        # If the data is not valid, return a response with the errors
-        return Response(serialized_vote.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Query article and check that article owner is not the same as the user
+        # making the request -> this avoids creators voting up their own article
+        article_id = request.data['vote']['article']
+        article = get_object_or_404(Article, pk=article_id)
+        if article.owner.id == request.user.id:
+            raise PermissionDenied('You cannot vote on your own article.')
+
+        # check if user has already cast a vote on article
+        user_has_voted = ArticleVote.objects.filter(
+            owner=request.user.id,
+            article=article_id
+        )
+
+        def _add_vote():
+            """helper function that adds a vote"""
+            # Add user to request data object
+            request.data['vote']['owner'] = request.user.id
+            # Serialize/create article
+            serialized_vote = ArticleVotesSerializer(data=request.data['vote'])
+            # If the data is valid according to our serializer...
+            if serialized_vote.is_valid():
+                # Save the created article & send a response
+                serialized_vote.save()
+                return Response({'vote': serialized_vote.data}, status=status.HTTP_201_CREATED)
+            # If the data is not valid, return a response with the errors
+            return Response(serialized_vote.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        if len(user_has_voted) == 1:
+            # if user has cast a vote, check if the vote is in the same direction
+            if user_has_voted.filter(vote=request.data['vote']['vote']):
+                # if yes: return error saying that only one vote may be case
+                if request.data['vote']['vote'] == 0:
+                    raise PermissionDenied('You have already removed your vote.')
+                else:
+                    raise PermissionDenied('You may not cast more than one vote.')
+            else:
+                # if no: then remove old vote and add new one
+                user_has_voted.delete()
+                return _add_vote()
+        else:
+            return _add_vote()
 
 
 class ArticleVotesDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -59,3 +92,10 @@ class ArticleVotesDetail(generics.RetrieveUpdateDestroyAPIView):
 
         return Response({'net_votes': net_votes})
 
+    def delete(self, request, pk):
+        """Delete a vote with pk - purely needed for admin purposes"""
+        vote = get_object_or_404(ArticleVote, pk=pk)
+        if not request.user.id == vote.owner.id:
+            raise PermissionDenied('Unauthorized, you are not the author of this vote!')
+        vote.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
