@@ -1,6 +1,6 @@
 #!/bin/bash
 
-curl "http://localhost:8000/article-votes/${ID}/" \
+curl "http://localhost:8000/my-articles/" \
   --include \
   --request GET \
   --header "Authorization: Token ${TOKEN}" \

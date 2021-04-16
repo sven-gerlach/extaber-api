@@ -7,7 +7,9 @@ curl "http://localhost:8000/articles/" \
   --header "Authorization: Token ${TOKEN}" \
   --data '{
     "article": {
-      "headline": "'"${HL}"'",
+      "img_url": "'"${URL}"'",
+      "title": "'"${TITLE}"'",
+      "sub_title": "'"${SUB}"'",
       "body": "'"${BODY}"'"
     }
   }'
