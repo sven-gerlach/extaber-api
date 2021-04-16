@@ -13,10 +13,10 @@ class Comments(generics.ListCreateAPIView):
     """A class for a PostgreSQL comment model"""
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def get(self, request):
-        """Index request for all comments associated with authorized user"""
-        comment = Comment.objects.all().filter(owner=request.user.id)
-        serialized_comment = CommentSerializer(comment, many=True)
+    def get(self, request, pk):
+        """Retrieve all comments associated with article pk"""
+        comments = Comment.objects.all().filter(article=pk)
+        serialized_comment = CommentSerializer(comments, many=True)
         return Response({'comments': serialized_comment.data})
 
     def post(self, request):
@@ -32,14 +32,18 @@ class Comments(generics.ListCreateAPIView):
         return Response(serialized_comment.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class MyComments(generics.ListAPIView):
+    """A class for retrieving all of a user's comments"""
+
+    def get(self, request):
+        """Index request for all comments associated with authorized user"""
+        comment = Comment.objects.all().filter(owner=request.user.id)
+        serialized_comment = CommentSerializer(comment, many=True)
+        return Response({'comments': serialized_comment.data})
+
+
 class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     """class for all requests that amend an existing comment with a particular pk"""
-
-    def get(self, request, pk):
-        """Retrieve all comments associated with article pk"""
-        comments = Comment.objects.all().filter(article=pk)
-        serialized_comment = CommentSerializer(comments, many=True)
-        return Response({'comments': serialized_comment.data})
 
     def partial_update(self, request, pk):
         """Update request owned by the user"""

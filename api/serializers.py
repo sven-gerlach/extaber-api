@@ -22,10 +22,11 @@ class CommentVotesSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     """A serializer class for comments"""
     net_votes = serializers.SerializerMethodField()
+    author = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
-        fields = ('id', 'body', 'article', 'owner', 'net_votes')
+        fields = ('id', 'body', 'article', 'owner', 'net_votes', 'author', 'created_at', 'updated_at')
 
     def get_net_votes(self, comment):
         comment_votes = comment.commentvote_set.all()
@@ -35,6 +36,9 @@ class CommentSerializer(serializers.ModelSerializer):
             net_votes += key.vote
 
         return net_votes
+
+    def get_author(self, comment):
+        return comment.owner.email
 
 
 class ArticleSerializer(serializers.ModelSerializer):
