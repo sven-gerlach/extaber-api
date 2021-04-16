@@ -32,12 +32,12 @@ class Article(models.Model):
     def __str__(self):
         return f"Article with title: {self.title}"
 
-    def as_dict(self):
-        """Returns dictionary version of Article model"""
-        return {
-            'pk': self.pk,
-            'title': self.title,
-            'body': self.body,
-            'owner': self.owner,
-            'votes': self.votes
-        }
+    # def as_dict(self):
+    #     """Returns dictionary version of Article model"""
+    #     return {
+    #         'pk': self.pk,
+    #         'title': self.title,
+    #         'body': self.body,
+    #         'owner': self.owner,
+    #         'votes': self.votes
+    #     }
