@@ -2,9 +2,11 @@
 
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.exceptions import PermissionDenied
 from rest_framework import generics, status
 from ..serializers import ArticleVotesSerializer
 from ..models.article_votes import ArticleVote
+from django.shortcuts import get_object_or_404
 
 class ArticleVotes(generics.ListCreateAPIView):
     """
@@ -23,6 +25,7 @@ class ArticleVotes(generics.ListCreateAPIView):
 
     def post(self, request):
         """Create a vote"""
+        print(request.body)
         # Add user to request data object
         request.data['vote']['owner'] = request.user.id
         # Serialize/create article
@@ -59,3 +62,10 @@ class ArticleVotesDetail(generics.RetrieveUpdateDestroyAPIView):
 
         return Response({'net_votes': net_votes})
 
+    def delete(self, request, pk):
+        """Delete a vote with pk - purely needed for admin purposes"""
+        vote = get_object_or_404(ArticleVote, pk=pk)
+        if not request.user.id == vote.owner.id:
+            raise PermissionDenied('Unauthorized, you are not the author of this vote!')
+        vote.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
