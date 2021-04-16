@@ -2,9 +2,12 @@
 
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.exceptions import PermissionDenied
 from rest_framework import generics, status
+from django.shortcuts import get_object_or_404
 from ..serializers import CommentVotesSerializer
 from ..models.comment_votes import CommentVote
+from ..models.comment import Comment
 
 class CommentVotes(generics.ListCreateAPIView):
     """
@@ -23,6 +26,13 @@ class CommentVotes(generics.ListCreateAPIView):
 
     def post(self, request):
         """Create a vote"""
+        # Query comment and check that comment owner is not the same as the user
+        # making the request -> this avoids creators voting up their own comments
+        comment_id = request.data['vote']['comment']
+        comment = get_object_or_404(Comment, pk=comment_id)
+        if comment.owner.id == request.user.id:
+            raise PermissionDenied('You cannot vote on your own comment.')
+
         # Add user to request data object
         request.data['vote']['owner'] = request.user.id
         # Serialize/create article
