@@ -57,7 +57,10 @@ class ArticleVotes(generics.ListCreateAPIView):
             # if user has cast a vote, check if the vote is in the same direction
             if user_has_voted.filter(vote=request.data['vote']['vote']):
                 # if yes: return error saying that only one vote may be case
-                raise PermissionDenied('You may not cast more than one vote.')
+                if request.data['vote']['vote'] == 0:
+                    raise PermissionDenied('You have already removed your vote.')
+                else:
+                    raise PermissionDenied('You may not cast more than one vote.')
             else:
                 # if no: then remove old vote and add new one
                 user_has_voted.delete()

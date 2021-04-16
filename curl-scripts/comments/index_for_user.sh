@@ -1,6 +1,6 @@
 #!/bin/bash
 
-curl "http://localhost:8000/comments/" \
+curl "http://localhost:8000/my-comments/" \
   --include \
   --request GET \
   --header "Authorization: Token ${TOKEN}" \
