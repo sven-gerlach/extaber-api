@@ -33,17 +33,37 @@ class ArticleVotes(generics.ListCreateAPIView):
         if article.owner.id == request.user.id:
             raise PermissionDenied('You cannot vote on your own article.')
 
-        # Add user to request data object
-        request.data['vote']['owner'] = request.user.id
-        # Serialize/create article
-        serialized_vote = ArticleVotesSerializer(data=request.data['vote'])
-        # If the data is valid according to our serializer...
-        if serialized_vote.is_valid():
-            # Save the created article & send a response
-            serialized_vote.save()
-            return Response({'vote': serialized_vote.data}, status=status.HTTP_201_CREATED)
-        # If the data is not valid, return a response with the errors
-        return Response(serialized_vote.errors, status=status.HTTP_400_BAD_REQUEST)
+        # check if user has already cast a vote on article
+        user_has_voted = ArticleVote.objects.filter(
+            owner=request.user.id,
+            article=article_id
+        )
+
+        def _add_vote():
+            """helper function that adds a vote"""
+            # Add user to request data object
+            request.data['vote']['owner'] = request.user.id
+            # Serialize/create article
+            serialized_vote = ArticleVotesSerializer(data=request.data['vote'])
+            # If the data is valid according to our serializer...
+            if serialized_vote.is_valid():
+                # Save the created article & send a response
+                serialized_vote.save()
+                return Response({'vote': serialized_vote.data}, status=status.HTTP_201_CREATED)
+            # If the data is not valid, return a response with the errors
+            return Response(serialized_vote.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        if len(user_has_voted) == 1:
+            # if user has cast a vote, check if the vote is in the same direction
+            if user_has_voted.filter(vote=request.data['vote']['vote']):
+                # if yes: return error saying that only one vote may be case
+                raise PermissionDenied('You may not cast more than one vote.')
+            else:
+                # if no: then remove old vote and add new one
+                user_has_voted.delete()
+                return _add_vote()
+        else:
+            return _add_vote()
 
 
 class ArticleVotesDetail(generics.RetrieveUpdateDestroyAPIView):
