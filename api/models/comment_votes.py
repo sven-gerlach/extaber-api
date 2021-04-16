@@ -19,6 +19,9 @@ class CommentVote(models.Model):
     comment = models.ForeignKey('Comment', on_delete=models.CASCADE)
     vote = models.IntegerField(default=0, validators=[MinValueValidator(-1), MaxValueValidator(1)])
 
+    class Meta:
+        unique_together = ['owner', 'comment']
+
     def __str__(self):
         return self.vote
 
