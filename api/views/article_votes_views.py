@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import generics, status
 from ..serializers import ArticleVotesSerializer
+from ..models.article import Article
 from ..models.article_votes import ArticleVote
 from django.shortcuts import get_object_or_404
 
@@ -25,7 +26,13 @@ class ArticleVotes(generics.ListCreateAPIView):
 
     def post(self, request):
         """Create a vote"""
-        print(request.body)
+        # Query article and check that article owner is not the same as the user
+        # making the request -> this avoids creators voting up their own article
+        article_id = request.data['vote']['article']
+        article = get_object_or_404(Article, pk=article_id)
+        if article.owner.id == request.user.id:
+            raise PermissionDenied('You cannot vote on your own article.')
+
         # Add user to request data object
         request.data['vote']['owner'] = request.user.id
         # Serialize/create article
