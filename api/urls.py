@@ -1,5 +1,5 @@
 from django.urls import path
-from .views.user_views import SignUp, SignIn, SignOut, ChangePassword
+from .views.user_views import SignUp, SignIn, SignOut, ChangePassword, GetUserDetails, UpdateUserDetails
 from .views.article_views import Articles, ArticleDetail, MyArticles, ShowArticle
 from .views.comment_views import Comments, CommentDetail, MyComments
 from .views.article_votes_views import ArticleVotes, ArticleVotesDetail
@@ -11,6 +11,8 @@ urlpatterns = [
     path('sign-in/', SignIn.as_view(), name='sign-in'),
     path('sign-out/', SignOut.as_view(), name='sign-out'),
     path('change-pw/', ChangePassword.as_view(), name='change-pw'),
+    path('get-user-details/', GetUserDetails.as_view(), name='get-user-details'),
+    path('update-user-details/', UpdateUserDetails.as_view(), name='update-user-details'),
 
     # article paths
     path('articles/', Articles.as_view(), name='articles'),
