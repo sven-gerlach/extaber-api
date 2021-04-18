@@ -147,12 +147,13 @@ class UserSerializer(serializers.ModelSerializer):
         # get_user_model will get the user model (this is required)
         # https://docs.djangoproject.com/en/3.0/topics/auth/customizing/#referencing-the-user-model
         model = get_user_model()
-        fields = ('id', 'email', 'password')
+        fields = ('id', 'email', 'password', 'username', 'user_img_url')
         extra_kwargs = {'password': {'write_only': True, 'min_length': 3}}
 
     # This create method will be used for model creation
     def create(self, validated_data):
         return get_user_model().objects.create_user(**validated_data)
+
 
 class UserRegisterSerializer(serializers.Serializer):
     # Require email, password, and password_confirmation for sign up
@@ -171,7 +172,16 @@ class UserRegisterSerializer(serializers.Serializer):
         # if all is well, return the data
         return data
 
+
 class ChangePasswordSerializer(serializers.Serializer):
     model = get_user_model()
     old = serializers.CharField(required=True)
     new = serializers.CharField(required=True)
+
+
+class GetUserDetailsSerializer(serializers.ModelSerializer):
+    """A class for returning user data that users are allowed to update"""
+    class Meta:
+        model = get_user_model()
+        fields = ('username', 'user_img_url')
+

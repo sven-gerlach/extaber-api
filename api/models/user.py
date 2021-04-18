@@ -63,6 +63,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
+    # add username if user's choose to be referred to by their username instead of email
+    username = models.CharField(max_length=50, blank=True)
+
+    # add user image
+    user_img_url = models.URLField(blank=True)
+
     # Any time we call User.objects (such as in objects.all() or objects.filter())
     # make sure to use the custom user manager we created.
     objects = UserManager()

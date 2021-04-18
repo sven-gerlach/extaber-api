@@ -1,13 +1,9 @@
-# from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import PermissionDenied
 from rest_framework import status, generics
-from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user, authenticate, login, logout
+from ..serializers import UserSerializer, UserRegisterSerializer,  ChangePasswordSerializer, GetUserDetailsSerializer
+from django.contrib.auth import get_user_model
 
-from ..serializers import UserSerializer, UserRegisterSerializer,  ChangePasswordSerializer
-from ..models.user import User
 
 class SignUp(generics.CreateAPIView):
     # Override the authentication/permissions classes so this endpoint
@@ -34,6 +30,7 @@ class SignUp(generics.CreateAPIView):
                 return Response(created_user.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class SignIn(generics.CreateAPIView):
     # Override the authentication/permissions classes so this endpoint
@@ -70,6 +67,7 @@ class SignIn(generics.CreateAPIView):
         else:
             return Response({ 'msg': 'The username and/or password is incorrect.' }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
+
 class SignOut(generics.DestroyAPIView):
     def delete(self, request):
         # Remove this token from the user
@@ -77,6 +75,7 @@ class SignOut(generics.DestroyAPIView):
         # Logout will remove all session data
         logout(request)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class ChangePassword(generics.UpdateAPIView):
     def partial_update(self, request):
@@ -97,3 +96,29 @@ class ChangePassword(generics.UpdateAPIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetUserDetails(generics.ListAPIView):
+    """A class for retrieving user details"""
+
+    def get(self, request):
+        """return the user details that users are allowed to update"""
+        user_model = get_user_model()
+        user = user_model.objects.get(pk=request.user.id)
+        serialized_user = GetUserDetailsSerializer(user)
+        return Response({'user': serialized_user.data})
+
+
+class UpdateUserDetails(generics.UpdateAPIView):
+    """Class for updating user details"""
+
+    def partial_update(self, request):
+        """Partially update user details"""
+        user_model = get_user_model()
+        user = user_model.objects.get(pk=request.user.id)
+        print('user: ', user.__dict__)
+        serialized_user = UserSerializer(user, data=request.data['user'], partial=True)
+        if serialized_user.is_valid():
+            serialized_user.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(serialized_user.errors, status=status.HTTP_400_BAD_REQUEST)
