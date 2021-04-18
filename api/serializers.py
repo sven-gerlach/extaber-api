@@ -134,6 +134,10 @@ class ArticleSerializerUnauthenticated(serializers.ModelSerializer):
 
 
 class MyArticleSerializer(ArticleSerializerUnauthenticated):
+    author_email = serializers.SerializerMethodField()
+    author_img_url = serializers.SerializerMethodField()
+    author_username = serializers.SerializerMethodField()
+    
     class Meta:
         model = Article
         fields = (
@@ -143,12 +147,26 @@ class MyArticleSerializer(ArticleSerializerUnauthenticated):
             'img_url',
             'body',
             'comments',
-            'author',
+            'author_email',
+            'author_img_url',
+            'author_username',
             'created_at',
             'updated_at',
             'net_votes',
             'comment_count'
         )
+
+    def get_author_email(self, article):
+        """serializer method returning the owner email"""
+        return article.owner.email
+
+    def get_author_img_url(self, article):
+        """serializer method returning the owner img url"""
+        return article.owner.user_img_url
+
+    def get_author_username(self, article):
+        """serializer method returning the owner username"""
+        return article.owner.username
 
 
 class UserSerializer(serializers.ModelSerializer):
