@@ -85,7 +85,9 @@ class ArticleSerializer(serializers.ModelSerializer):
 
 class ArticleSerializerUnauthenticated(serializers.ModelSerializer):
     """A serializer class for unauthenticated users"""
-    author = serializers.SerializerMethodField()
+    author_email = serializers.SerializerMethodField()
+    author_img_url = serializers.SerializerMethodField()
+    author_username = serializers.SerializerMethodField()
     net_votes = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
 
@@ -96,15 +98,25 @@ class ArticleSerializerUnauthenticated(serializers.ModelSerializer):
             'title',
             'sub_title',
             'img_url',
-            'author',
+            'author_email',
+            'author_img_url',
+            'author_username',
             'created_at',
             'net_votes',
             'comment_count'
         )
 
-    def get_author(self, article):
+    def get_author_email(self, article):
         """serializer method returning the owner email"""
         return article.owner.email
+
+    def get_author_img_url(self, article):
+        """serializer method returning the owner img url"""
+        return article.owner.user_img_url
+
+    def get_author_username(self, article):
+        """serializer method returning the owner username"""
+        return article.owner.username
 
     def get_net_votes(self, article):
         """serializer method return the net votes"""
