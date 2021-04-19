@@ -20,7 +20,7 @@ class Articles(generics.ListCreateAPIView):
     def get(self, request):
         """Index request to get all articles"""
         # Get all the articles:
-        articles = Article.objects.all()
+        articles = Article.objects.all().order_by('-created_at')
         # Run the data through the serializer
         serialized_article = ArticleSerializerUnauthenticated(articles, many=True)
         return Response({'articles': serialized_article.data})
@@ -61,7 +61,7 @@ class MyArticles(generics.ListAPIView):
     def get(self, request):
         """Index request to get all articles created by user"""
         articles = Article.objects.all()
-        my_articles = articles.filter(owner=request.user.id)
+        my_articles = articles.filter(owner=request.user.id).order_by('-created_at')
         my_articles_serialized = MyArticleSerializer(my_articles, many=True)
         return Response({'my_articles': my_articles_serialized.data}, status=status.HTTP_200_OK)
 
