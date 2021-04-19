@@ -22,11 +22,24 @@ class CommentVotesSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     """A serializer class for comments"""
     net_votes = serializers.SerializerMethodField()
-    author = serializers.SerializerMethodField()
+    author_email = serializers.SerializerMethodField()
+    author_img_url = serializers.SerializerMethodField()
+    author_username = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
-        fields = ('id', 'body', 'article', 'owner', 'net_votes', 'author', 'created_at', 'updated_at')
+        fields = (
+            'id',
+            'body',
+            'article',
+            'owner',
+            'net_votes',
+            'author_email',
+            'author_img_url',
+            'author_username',
+            'created_at',
+            'updated_at'
+        )
 
     def get_net_votes(self, comment):
         comment_votes = comment.commentvote_set.all()
@@ -37,15 +50,23 @@ class CommentSerializer(serializers.ModelSerializer):
 
         return net_votes
 
-    def get_author(self, comment):
+    def get_author_email(self, comment):
         return comment.owner.email
+    
+    def get_author_img_url(self, comment):
+        return comment.owner.user_img_url
+
+    def get_author_username(self, comment):
+        return comment.owner.username
 
 
 class ArticleSerializer(serializers.ModelSerializer):
     """Serializer for the Article class"""
     comments = serializers.StringRelatedField(many=True, read_only=True)
     net_votes = serializers.SerializerMethodField()
-    author = serializers.SerializerMethodField()
+    author_email = serializers.SerializerMethodField()
+    author_img_url = serializers.SerializerMethodField()
+    author_username = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -61,7 +82,9 @@ class ArticleSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'owner',
-            'author',
+            'author_email',
+            'author_img_url',
+            'author_username',
             'comment_count'
         )
 
@@ -74,9 +97,17 @@ class ArticleSerializer(serializers.ModelSerializer):
 
         return net_votes
 
-    def get_author(self, article):
+    def get_author_email(self, article):
         """serializer method returning the owner email"""
         return article.owner.email
+
+    def get_author_img_url(self, article):
+        """serializer method returning the owner img url"""
+        return article.owner.user_img_url
+
+    def get_author_username(self, article):
+        """serializer method returning the owner username"""
+        return article.owner.username
 
     def get_comment_count(self, article):
         """Serializer method returning the count of comments made on each article"""
@@ -85,7 +116,9 @@ class ArticleSerializer(serializers.ModelSerializer):
 
 class ArticleSerializerUnauthenticated(serializers.ModelSerializer):
     """A serializer class for unauthenticated users"""
-    author = serializers.SerializerMethodField()
+    author_email = serializers.SerializerMethodField()
+    author_img_url = serializers.SerializerMethodField()
+    author_username = serializers.SerializerMethodField()
     net_votes = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
 
@@ -96,15 +129,25 @@ class ArticleSerializerUnauthenticated(serializers.ModelSerializer):
             'title',
             'sub_title',
             'img_url',
-            'author',
+            'author_email',
+            'author_img_url',
+            'author_username',
             'created_at',
             'net_votes',
             'comment_count'
         )
 
-    def get_author(self, article):
+    def get_author_email(self, article):
         """serializer method returning the owner email"""
         return article.owner.email
+
+    def get_author_img_url(self, article):
+        """serializer method returning the owner img url"""
+        return article.owner.user_img_url
+
+    def get_author_username(self, article):
+        """serializer method returning the owner username"""
+        return article.owner.username
 
     def get_net_votes(self, article):
         """serializer method return the net votes"""
@@ -122,6 +165,10 @@ class ArticleSerializerUnauthenticated(serializers.ModelSerializer):
 
 
 class MyArticleSerializer(ArticleSerializerUnauthenticated):
+    author_email = serializers.SerializerMethodField()
+    author_img_url = serializers.SerializerMethodField()
+    author_username = serializers.SerializerMethodField()
+
     class Meta:
         model = Article
         fields = (
@@ -131,12 +178,26 @@ class MyArticleSerializer(ArticleSerializerUnauthenticated):
             'img_url',
             'body',
             'comments',
-            'author',
+            'author_email',
+            'author_img_url',
+            'author_username',
             'created_at',
             'updated_at',
             'net_votes',
             'comment_count'
         )
+
+    def get_author_email(self, article):
+        """serializer method returning the owner email"""
+        return article.owner.email
+
+    def get_author_img_url(self, article):
+        """serializer method returning the owner img url"""
+        return article.owner.user_img_url
+
+    def get_author_username(self, article):
+        """serializer method returning the owner username"""
+        return article.owner.username
 
 
 class UserSerializer(serializers.ModelSerializer):

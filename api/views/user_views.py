@@ -58,6 +58,8 @@ class SignIn(generics.CreateAPIView):
                 return Response({
                     'user': {
                         'id': user.id,
+                        'username': user.username,
+                        'user_img_url': user.user_img_url,
                         'email': user.email,
                         'token': user.get_auth_token()
                     }
@@ -120,5 +122,5 @@ class UpdateUserDetails(generics.UpdateAPIView):
         serialized_user = UserSerializer(user, data=request.data['user'], partial=True)
         if serialized_user.is_valid():
             serialized_user.save()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({"user": serialized_user.data}, status=status.HTTP_200_OK)
         return Response(serialized_user.errors, status=status.HTTP_400_BAD_REQUEST)
