@@ -1,6 +1,6 @@
 from django.urls import path
 from .views.user_views import SignUp, SignIn, SignOut, ChangePassword, GetUserDetails, UpdateUserDetails
-from .views.article_views import Articles, ArticleDetail, MyArticles, ShowArticle
+from .views.article_views import Articles, ArticleDetail, MyArticles, ShowArticle, ArticlesSearch
 from .views.comment_views import Comments, CommentDetail, MyComments
 from .views.article_votes_views import ArticleVotes, ArticleVotesDetail
 from .views.comment_votes_views import CommentVotes, CommentVotesDetail
@@ -16,6 +16,7 @@ urlpatterns = [
 
     # article paths
     path('articles/', Articles.as_view(), name='articles'),
+    path('articles/search/<slug:search_string>/', ArticlesSearch.as_view(), name='articles_filtered'),
     path('my-articles/', MyArticles.as_view(), name='my_articles'),
     path('articles/<int:pk>/', ArticleDetail.as_view(), name='article_detail'),
     path('article/<int:pk>/', ShowArticle.as_view(), name='article'),
