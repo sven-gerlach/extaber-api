@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import generics, status
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from ..models.article import Article
 from ..serializers import \
     ArticleSerializer, \
@@ -39,6 +40,25 @@ class Articles(generics.ListCreateAPIView):
             return Response({'article': serialized_article.data}, status=status.HTTP_201_CREATED)
         # If the data is not valid, return a response with the errors
         return Response(serialized_article.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ArticlesSearch(generics.ListAPIView):
+    """A class for searching through the articles model and returning a filtered query set"""
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request, search_string):
+        """Return articles filtered for search string"""
+        # Get all the articles:
+        articles = Article.objects.all()
+        # filter articles for search string
+        filtered_articles = articles.filter(
+            Q(title__contains=search_string) |
+            Q(sub_title__contains=search_string) |
+            Q(body__contains=search_string)
+        )
+        sorted_articles = filtered_articles.order_by('-created_at')
+        serialized_filtered_sorted_articles = ArticleSerializer(sorted_articles, many=True)
+        return Response({'articles': serialized_filtered_sorted_articles.data})
 
 
 class ShowArticle(generics.ListAPIView):
