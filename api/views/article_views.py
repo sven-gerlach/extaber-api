@@ -52,9 +52,9 @@ class ArticlesSearch(generics.ListAPIView):
         articles = Article.objects.all()
         # filter articles for search string
         filtered_articles = articles.filter(
-            Q(title__contains=search_string) |
-            Q(sub_title__contains=search_string) |
-            Q(body__contains=search_string)
+            Q(title__icontains=search_string) |
+            Q(sub_title__icontains=search_string) |
+            Q(body__icontains=search_string)
         )
         sorted_articles = filtered_articles.order_by('-created_at')
         serialized_filtered_sorted_articles = ArticleSerializer(sorted_articles, many=True)
