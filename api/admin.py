@@ -3,6 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from .models.user import User
 from .models.article import Article
+from .models.comment import Comment
 
 
 class UserAdmin(BaseUserAdmin):
@@ -43,3 +44,4 @@ class UserAdmin(BaseUserAdmin):
 # class to format the pages:
 admin.site.register(User, UserAdmin)
 admin.site.register(Article)
+admin.site.register(Comment)
