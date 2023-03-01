@@ -7,7 +7,11 @@ databases:
 services:
   - type: web
     name: api
+    repo: https://github.com/sven-gerlach/extaber-api.git
     env: python
+    region: ohio
+    plan: free
+    branch: main
     buildCommand: pipenv install --quiet --verbose --ignore-pipfile && python manage.py migrate --no-input
     startCommand: gunicorn -b :$PORT extaber-api:wsgi
     envVars:
