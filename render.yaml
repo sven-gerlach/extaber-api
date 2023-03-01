@@ -2,6 +2,7 @@ databases:
   - name: db
     databaseName: extaber
     user: admin
+    plan: free
     ipAllowList: [] # only allow internal connections
 
 services:
