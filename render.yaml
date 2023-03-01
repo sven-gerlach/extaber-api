@@ -1,0 +1,23 @@
+databases:
+  - name: db
+    databaseName: extaber
+    user: admin
+    ipAllowList: [] # only allow internal connections
+
+services:
+  - type: web
+    name: api
+    env: python
+    buildCommand: pipenv install --quiet --verbose --ignore-pipfile && python manage.py migrate --no-input
+    startCommand: gunicorn -b :$PORT extaber-api:wsgi
+    envVars:
+      - key: CLIENT_ORIGIN
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: db
+          property: connectionString
+      - key: POSTGRES_PASSWORD
+        sync: false
+      - key: SECRET_KEY
+        sync: false

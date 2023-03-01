@@ -16,33 +16,38 @@ import dj_database_url
 
 # .env config:
 from dotenv import load_dotenv, find_dotenv
+
 load_dotenv(find_dotenv())
 
 # Determine if we are on local or production
-if os.getenv('ENV') == 'development':
-  # If we are on development, use the `DB_NAME_DEV` value
-  # from the .env file as the database name
-  DB_NAME = os.getenv('DB_NAME_DEV')
-  DB = {
-      'ENGINE': 'django.db.backends.postgresql',
-      'NAME': DB_NAME,
-  }
-  # Set debug to true
-  DEBUG = True
-  # Only allow locally running client at port 7165 for CORS
-  CORS_ORIGIN_WHITELIST = [
-      'http://localhost:7165',
-  ]
+environment = os.getenv('DOPPLER_CONFIG')
+if environment == 'dev':
+    DB = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'extaber',
+        'USER': 'admin',
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': 'localhost',
+        'PORT': '5432'
+    }
+    # Set debug to true
+    DEBUG = True
+    # Only allow locally running client at port 7165 for CORS
+    CORS_ORIGIN_WHITELIST = [
+        os.getenv('CLIENT_ORIGIN'),
+    ]
+elif environment == 'prod':
+    # If we are on production, use the dj_database_url package
+    # to locate the database based on Heroku setup
+    DB = dj_database_url.config()
+    # Set debug to false
+    DEBUG = False
+    # Only allow the `CLIENT_ORIGIN` for CORS
+    CORS_ORIGIN_WHITELIST = [
+        os.getenv('CLIENT_ORIGIN')
+    ]
 else:
-  # If we are on production, use the dj_database_url package
-  # to locate the database based on Heroku setup
-  DB = dj_database_url.config()
-  # Set debug to false
-  DEBUG = False
-  # Only allow the `CLIENT_ORIGIN` for CORS
-  CORS_ORIGIN_WHITELIST = [
-    os.getenv('CLIENT_ORIGIN')
-  ]
+    raise Exception(f'The environment name "{environment}" is inappropriate')
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -60,7 +65,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # This uses either a .env key or Heroku config var called SECRET
-SECRET_KEY = os.getenv('SECRET')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # Application definition
 
@@ -132,7 +137,6 @@ REST_FRAMEWORK = {
     ]
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -151,8 +155,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Allow all host headers
-ALLOWED_HOSTS = ['*']
+# Allow all host headers in dev and otherwise only the client's production url
+# Note: when DEBUG is truthy, ALLOWED_HOSTS is automatically set to localhost
+# RENDER_EXTERNAL_HOSTNAME environment variable is automatically set by the cloud service Render
+ALLOWED_HOSTS = []
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -167,7 +176,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 # optional package: http://whitenoise.evans.io/en/stable/django.html
@@ -176,3 +184,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Use the custom user model as the auth user for the admin view
 AUTH_USER_MODEL = 'api.User'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
