@@ -55,6 +55,8 @@ else:
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 # Default database as defined above depending on development
 # or production environment
+print(DB)
+print(dir(DB))
 DATABASES = {
     'default': DB
 }
