@@ -26,3 +26,5 @@ services:
         sync: false
       - key: SECRET_KEY
         sync: false
+      - key: DOPPLER_CONFIG
+        sync: false
