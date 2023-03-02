@@ -2,6 +2,7 @@ databases:
   - name: extaber-db
     databaseName: extaber
     user: admin
+    region: ohio
     plan: free
     ipAllowList: [] # only allow internal connections
 
