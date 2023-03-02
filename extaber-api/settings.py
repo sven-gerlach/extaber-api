@@ -49,7 +49,7 @@ elif environment == 'prod':
         os.getenv('CLIENT_ORIGIN')
     ]
 else:
-    raise Exception(f'The environment name "{environment}" is inappropriate')
+    raise Exception(f'The env var DOPPLER_CONFIG "{environment}" is not acceptable. Must be either "dev" or "prod".')
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
