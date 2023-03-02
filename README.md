@@ -1,21 +1,28 @@
 # ExTABER
 
 ## Introduction
+
 ExTABER is a platform where independent investigative journalists can publish their work, create a readership, and 
 potentially monetise their work. The ethos underlying ExTABER is hidden in form of an anagram in its name. The 
 anagram is based on the epistemological viewpoint that free thought must exist **Ex** **T**radition, **A**authority, 
 **E**established **Be**lief, and **R**evelation.
 
+
 ## Link to Repositories & Deployed Sites
+
 ### Front-End
+
 The repo can be found on [GitHub](https://github.com/sven-gerlach/extaber-client) whilst the deployed APP is hosted 
-on [GitHub Pages](https://sven-gerlach.github.io/extaber-client/#/)
+on [AWS Amplify](https://main.d33ikcjgiasu7y.amplifyapp.com/#/)
+
 
 ### Back-End
 The repo can be found on [GitHub](https://github.com/sven-gerlach/extaber-api) whilst the deployed back-end is hosted 
-on [Heroku](https://extaber-api.herokuapp.com/)
+on [Render](https://extaber-api.onrender.com)
+
 
 ## Development
+
 1. Clone this repo into your preferred local directory
 2. Ensure pip, pipenv, and pyenv are installed locally (install pyenv with brew, pipenv with pip,
    and pip with `python -m ensurepip --upgrade`)
@@ -32,6 +39,10 @@ on [Heroku](https://extaber-api.herokuapp.com/)
 8. Run `pipenv shell` to initiate the environment
 9. Ensure the extaber database has all the tables setup by running `doppler run -- python manage.py migrate`
 10. Check that there are no outstanding migrations (there shouldn't be) with `doppler run -- python manage.py showmigrations`
+
+## Deployment
+The API gets deployed automatically if a new commit is pushed to the remote main branch. The [render.yaml](./render.yaml) specifies
+the build and deployment infrastructure on Render.
 
 ## ERD
 This back-end is entirely based on django, django rest framework, and PostgreSQL. It features many-to-many relationships, 
