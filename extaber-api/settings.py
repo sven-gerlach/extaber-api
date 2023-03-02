@@ -19,6 +19,8 @@ from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
 
+print(os.getenv('DATABASE_URL'))
+
 # Determine if we are on local or production
 environment = os.getenv('DOPPLER_CONFIG')
 if environment == 'dev':
