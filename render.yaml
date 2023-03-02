@@ -15,7 +15,7 @@ services:
     plan: free
     branch: main
     buildCommand: pipenv install --deploy --system && python manage.py migrate --no-input
-    startCommand: gunicorn -b :$PORT extaber-api:wsgi
+    startCommand: gunicorn -b :$PORT extaber-api.wsgi
     envVars:
       - key: CLIENT_ORIGIN
         sync: false

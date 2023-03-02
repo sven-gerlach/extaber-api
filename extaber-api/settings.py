@@ -32,7 +32,7 @@ if environment == 'dev':
     }
     # Set debug to true
     DEBUG = True
-    # Only allow locally running client at port 7165 for CORS
+    # Only allow the `CLIENT_ORIGIN` for CORS
     CORS_ORIGIN_WHITELIST = [
         os.getenv('CLIENT_ORIGIN'),
     ]
