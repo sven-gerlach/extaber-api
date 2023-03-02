@@ -1,5 +1,5 @@
 databases:
-  - name: db
+  - name: extaber-db
     databaseName: extaber
     user: admin
     plan: free
@@ -7,7 +7,7 @@ databases:
 
 services:
   - type: web
-    name: api
+    name: extaber-api
     repo: https://github.com/sven-gerlach/extaber-api.git
     env: python
     region: ohio
