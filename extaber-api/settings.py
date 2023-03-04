@@ -14,11 +14,6 @@ import os
 import sys
 import dj_database_url
 
-# .env config:
-from dotenv import load_dotenv, find_dotenv
-
-load_dotenv(find_dotenv())
-
 # Determine if we are on local or production
 environment = os.getenv('DOPPLER_CONFIG')
 if environment == 'dev':

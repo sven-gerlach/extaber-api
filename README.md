@@ -39,6 +39,7 @@ on [Render](https://extaber-api.onrender.com)
 8. Run `pipenv shell` to initiate the environment
 9. Ensure the extaber database has all the tables setup by running `doppler run -- python manage.py migrate`
 10. Check that there are no outstanding migrations (there shouldn't be) with `doppler run -- python manage.py showmigrations`
+11. Start the Django dev server with `doppler run - python manage runserver`
 
 ## Deployment
 The API gets deployed automatically if a new commit is pushed to the remote main branch. The [render.yaml](./render.yaml) specifies
